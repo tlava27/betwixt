@@ -62,3 +62,35 @@ Format: `[fragment a] _____ [fragment b]` → answer is the shared word.
 | 54 | black _____ house | bird | blackbird | birdhouse | |
 | 55 | butter _____ trap | fly | butterfly | flytrap | |
 | 56 | tea _____ cake | cup | teacup | cupcake | |
+
+The 56 above are shipped in `puzzles.js` — don't touch that table above. Everything below is a **new, uncurated batch (round 2)** for expanding past 56, generated 2026-09-25. Same rules as before: both source compounds real, both displayed fragments standalone recognizable words, no answer reused from the 56 above.
+
+## Round 2 candidates — 23 new, awaiting curation
+
+19 of these use connector words never used in the 56 above. The other 4 (case, stone, fish, bug) were generated in the original batch but cut during that curation round — not for being wrong, just not picked. Revisiting them here with that context rather than silently resurfacing them. (`bear` was also cut then, and stays cut — it was the one flagged "informal/toy term," so it's left out of this round rather than asked about again.)
+
+| # | Display | Answer | Source A | Source B | Notes |
+|---|---|---|---|---|---|
+| 57 | home _____ house | town | hometown | townhouse | |
+| 58 | battle _____ work | field | battlefield | fieldwork | |
+| 59 | flood _____ way | gate | floodgate | gateway | |
+| 60 | sign _____ card | post | signpost | postcard | |
+| 61 | saw _____ stone | mill | sawmill | millstone | |
+| 62 | chop _____ up | stick | chopstick | stickup | |
+| 63 | down _____ out | fall | downfall | fallout | |
+| 64 | long _____ gun | shot | longshot | shotgun | |
+| 65 | hand _____ fire | gun | handgun | gunfire | |
+| 66 | hour _____ work | glass | hourglass | glasswork | "glasswork" less common than "glassware" |
+| 67 | drift _____ work | wood | driftwood | woodwork | |
+| 68 | under _____ chair | arm | underarm | armchair | |
+| 69 | fruit _____ walk | cake | fruitcake | cakewalk | |
+| 70 | ginger _____ winner | bread | gingerbread | breadwinner | |
+| 71 | butter _____ shake | milk | buttermilk | milkshake | |
+| 72 | bull _____ ball | eye | bullseye | eyeball | |
+| 73 | saw _____ pick | tooth | sawtooth | toothpick | |
+| 74 | finger _____ biter | nail | fingernail | nailbiter | |
+| 75 | long _____ line | hair | longhair | hairline | |
+| 76 | brief _____ work | case | briefcase | casework | cut in round 1, not for quality |
+| 77 | mile _____ work | stone | milestone | stonework | cut in round 1, not for quality |
+| 78 | cat _____ bowl | fish | catfish | fishbowl | cut in round 1, not for quality |
+| 79 | lady _____ bear | bug | ladybug | bugbear | cut in round 1, not for quality |
