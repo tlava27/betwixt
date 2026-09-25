@@ -14,7 +14,7 @@ Example: *spotlight* + *lighthouse* → displayed as `spot _____ house` → answ
 
 *(Keep this updated — newest status here, details in `change_log.md`.)*
 
-- 2026-09-25: Live at `https://tlava27.github.io/betwixt/` (repo moved from private `tlaverriere/Betwixt` to public `tlava27/betwixt` — GitHub Pages needs a paid plan to publish from a private repo). Added a beta-testing "skip to next day" control and restyled the title's "i" (upside-down, dark orange). All 56 puzzles verified content-correct and end-to-end playable. Since then: added a post-solve Venn diagram revealing the word overlap, changed the share-text icon to echo the flipped "i", and switched the streak from flat +1/day to points by guess number (5/3/1). Streak-explainer placement recommended, not yet built.
+- 2026-09-25: Live at `https://tlava27.github.io/betwixt/` (repo moved from private `tlaverriere/Betwixt` to public `tlava27/betwixt` — GitHub Pages needs a paid plan to publish from a private repo). Added a beta-testing "skip to next day" control and restyled the title's "i" (upside-down, dark orange). All 56 puzzles verified content-correct and end-to-end playable. Since then: changed the share-text icon to echo the flipped "i", switched the streak from flat +1/day to points by guess number (5/3/1) with both an inline points message and a "(?)" rules panel, and replaced the original standalone Venn diagram (two circles below the puzzle) with translucent ovals overlaid directly on the solved puzzle row itself — went through several rounds of mockups with Trevor before landing here.
 
 ## Repository Structure
 
@@ -39,6 +39,7 @@ Example: *spotlight* + *lighthouse* → displayed as `spot _____ house` → answ
 - **Platform:** static HTML/CSS/JS, no backend, no accounts. Hosted on GitHub Pages from `github.com/tlava27/betwixt` (moved 2026-09-25 from the original private `tlaverriere/Betwixt` — Pages can't publish from a private repo without a paid plan). Requires `.nojekyll` at root or GitHub Pages tries to run Jekyll over the markdown files.
 - **Beta-testing day skip:** a "Skip to next day" button (`#skip-day-button`, always visible, outside the `#game` div so it survives every render state) adds to a `betwixt_debugDayOffset` localStorage value that's added to the real calendar-derived day index. Lets testers reach any puzzle without waiting for real days, and still correctly exercises the skip-breaks-streak logic. This is intentionally permanent for the beta phase, not scaffolding to remove later — revisit before a real public launch.
 - **Betwixt wordmark:** the "i" in the `<h1>` title is deliberately styled upside-down and dark orange (`.flip-i` in `styles.css`) — a design choice, not a rendering bug.
+- **Post-solve overlap reveal:** two translucent ovals (`.overlap-oval`) are drawn directly on top of the solved puzzle row in `renderSolved()` (`script.js`) — not a separate diagram below it, and not circles. Left oval spans `a`+answer, right spans answer+`b`, overlapping on the revealed letters. Their position/size is computed from `getBoundingClientRect()` on the real rendered text at solve time, not hardcoded pixel guesses — a hand-guessed version shipped with text poking outside the ovals before this was corrected. If this ever needs rebuilding, measure the real DOM, don't estimate font-metric widths by hand.
 
 ## Working Conventions
 

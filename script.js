@@ -94,67 +94,6 @@
     container.appendChild(line);
   }
 
-  // Post-solve reveal: two overlapping circles showing the source compounds,
-  // with the shared answer highlighted in the intersection.
-  function buildVennDiagram(puzzle) {
-    const NS = "http://www.w3.org/2000/svg";
-    const wordA = puzzle.a + puzzle.answer;
-    const wordB = puzzle.answer + puzzle.b;
-
-    function circle(cx, cy, r, fill, stroke) {
-      const c = document.createElementNS(NS, "circle");
-      c.setAttribute("cx", cx);
-      c.setAttribute("cy", cy);
-      c.setAttribute("r", r);
-      c.setAttribute("fill", fill);
-      if (stroke) {
-        c.setAttribute("stroke", stroke);
-        c.setAttribute("stroke-width", "2");
-      }
-      return c;
-    }
-
-    function text(x, y, str, size, fill, weight) {
-      const t = document.createElementNS(NS, "text");
-      t.setAttribute("x", x);
-      t.setAttribute("y", y);
-      t.setAttribute("text-anchor", "middle");
-      t.setAttribute("font-size", size);
-      t.setAttribute("fill", fill);
-      if (weight) t.setAttribute("font-weight", weight);
-      t.textContent = str;
-      return t;
-    }
-
-    const svg = document.createElementNS(NS, "svg");
-    svg.setAttribute("viewBox", "0 0 320 210");
-    svg.setAttribute("role", "img");
-    svg.setAttribute(
-      "aria-label",
-      wordA + " and " + wordB + " share the word " + puzzle.answer
-    );
-
-    const defs = document.createElementNS(NS, "defs");
-    const clipPath = document.createElementNS(NS, "clipPath");
-    clipPath.setAttribute("id", "venn-clip");
-    clipPath.appendChild(circle(190, 95, 70));
-    defs.appendChild(clipPath);
-    svg.appendChild(defs);
-
-    svg.appendChild(circle(110, 95, 70, "#eef2ee", "#2f6f4f"));
-    svg.appendChild(circle(190, 95, 70, "#fdece3", "#c1440e"));
-
-    const overlap = circle(110, 95, 70, "#c1440e");
-    overlap.setAttribute("clip-path", "url(#venn-clip)");
-    svg.appendChild(overlap);
-
-    svg.appendChild(text(110, 190, wordA, "12", "#1a1a1a"));
-    svg.appendChild(text(190, 190, wordB, "12", "#1a1a1a"));
-    svg.appendChild(text(150, 101, puzzle.answer, "15", "#ffffff", "700"));
-
-    return svg;
-  }
-
   document.addEventListener("DOMContentLoaded", function () {
     const now = new Date();
     const dayIndex = getDayIndex(now);
@@ -167,7 +106,6 @@
     const formEl = document.getElementById("guess-form");
     const inputEl = document.getElementById("guess-input");
     const shareButton = document.getElementById("share-button");
-    const vennEl = document.getElementById("venn-diagram");
     const skipDayButton = document.getElementById("skip-day-button");
     const streakInfoButton = document.getElementById("streak-info-button");
     const streakInfoEl = document.getElementById("streak-info");
@@ -227,22 +165,53 @@
       inputEl.value = "";
       formEl.querySelector("button").disabled = false;
       shareButton.hidden = true;
-      vennEl.hidden = true;
       inputEl.focus();
     }
 
+    // Post-solve reveal: two translucent ovals laid directly over this same
+    // row, sized from the real rendered text so nothing pokes outside either
+    // oval -- left oval spans "a"+answer, right spans answer+"b", overlapping
+    // exactly on the revealed letters.
     function renderSolved() {
-      const slots = puzzle.answer.split("");
       displayEl.textContent = "";
+
+      const ovalA = document.createElement("div");
+      ovalA.className = "overlap-oval";
+      const ovalB = document.createElement("div");
+      ovalB.className = "overlap-oval";
+      displayEl.appendChild(ovalA);
+      displayEl.appendChild(ovalB);
+
+      const row = document.createElement("div");
+      row.className = "puzzle-row";
       const prefix = document.createElement("span");
-      prefix.textContent = puzzle.a + " ";
-      displayEl.appendChild(prefix);
-      const blankSpan = document.createElement("span");
-      renderBlanks(blankSpan, slots);
-      displayEl.appendChild(blankSpan);
+      prefix.textContent = puzzle.a;
+      row.appendChild(prefix);
+      const tileGroup = document.createElement("span");
+      renderBlanks(tileGroup, puzzle.answer.split(""));
+      row.appendChild(tileGroup);
       const suffix = document.createElement("span");
-      suffix.textContent = " " + puzzle.b;
-      displayEl.appendChild(suffix);
+      suffix.textContent = puzzle.b;
+      row.appendChild(suffix);
+      displayEl.appendChild(row);
+
+      const pad = 9;
+      const wrapRect = displayEl.getBoundingClientRect();
+      const spotRect = prefix.getBoundingClientRect();
+      const tilesRect = tileGroup.getBoundingClientRect();
+      const houseRect = suffix.getBoundingClientRect();
+      const top = tilesRect.top - wrapRect.top - pad;
+      const height = tilesRect.height + pad * 2;
+
+      ovalA.style.left = spotRect.left - wrapRect.left - pad + "px";
+      ovalA.style.width = tilesRect.right - spotRect.left + pad * 2 + "px";
+      ovalA.style.top = top + "px";
+      ovalA.style.height = height + "px";
+
+      ovalB.style.left = tilesRect.left - wrapRect.left - pad + "px";
+      ovalB.style.width = houseRect.right - tilesRect.left + pad * 2 + "px";
+      ovalB.style.top = top + "px";
+      ovalB.style.height = height + "px";
 
       attemptsEl.textContent = "";
       const pointsEarned = POINTS_BY_ATTEMPT[state.attempts.length];
@@ -253,10 +222,6 @@
       inputEl.disabled = true;
       formEl.querySelector("button").disabled = true;
       shareButton.hidden = false;
-
-      vennEl.innerHTML = "";
-      vennEl.appendChild(buildVennDiagram(puzzle));
-      vennEl.hidden = false;
     }
 
     function renderFailed() {
@@ -278,7 +243,6 @@
       inputEl.disabled = true;
       formEl.querySelector("button").disabled = true;
       shareButton.hidden = true;
-      vennEl.hidden = true;
     }
 
     function render() {

@@ -103,11 +103,27 @@ h1 {
 }
 
 .puzzle-display {
+  position: relative;
   font-size: 1.3rem;
   font-weight: 600;
   margin-bottom: 24px;
   line-height: 1.6;
   word-break: break-word;
+}
+
+.puzzle-row {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.overlap-oval {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.25;
+  pointer-events: none;
 }
 
 .blank-slot {
@@ -208,15 +224,6 @@ button {
   line-height: 1.6;
 }
 
-.venn-diagram {
-  margin: 4px 0 16px;
-}
-
-.venn-diagram svg {
-  width: 100%;
-  max-width: 280px;
-  height: auto;
-}
 
 .beta-tools {
   margin-top: 20px;
