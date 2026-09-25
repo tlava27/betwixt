@@ -1,10 +1,12 @@
 # Puzzle Candidates — Phrase Track (separate from the compound-word track)
 
-93 candidates using **common two-word phrases** instead of compound words — the same overlap mechanic (Phrase A ends in the answer, Phrase B starts with it), but the two source pieces are fixed idiomatic phrases rather than single fused words. Kept deliberately separate from `puzzle-candidates.md` and **not merged into `puzzles.js`** — this is an uncurated pool, awaiting a curation pass the same way round 1 of the compound-word list got one.
+93 candidates using **common two-word phrases** instead of compound words — the same overlap mechanic (Phrase A ends in the answer, Phrase B starts with it), but the two source pieces are fixed idiomatic phrases rather than single fused words.
 
-Bar used: fixed/idiomatic phrases only (e.g. "credit card," "high school") — not just any grammatically plausible noun combo. A few entries below are flagged where the phrase leans dated, informal, technical, or sometimes gets written as one fused word instead of two — worth a second look during curation.
+**Merged into `puzzles.js` as-is on 2026-09-25** — no curation cut, same treatment as round 2 of the compound track. These are now days 79–171 of the live daily rotation, appended after the compound-word entries. Kept in this separate file for provenance/reference; `puzzles.js` is the source of truth for what's actually live.
 
-Several answer words repeat with different phrase pairs (e.g. "card" appears 5 times) — that's expected at this stage, same as round 1's raw batch before dedup. Whether to enforce one-answer-per-puzzle here, same as the compound track, is an open question for the curation pass.
+Bar used: fixed/idiomatic phrases only (e.g. "credit card," "high school") — not just any grammatically plausible noun combo. A few entries below are flagged where the phrase leans dated, informal, technical, or sometimes gets written as one fused word instead of two.
+
+**Known consequence of merging as-is:** answer words repeat heavily now — within this set (card×5, school×5, dog×5, house×5, game×4, and more) and against the compound track (15 answer words — dog, house, table, game, night, light, time, work, show, room, hand, line, ball, door, head — exist in both tracks). The "one puzzle per answer" property the compound track had after its round-1 curation no longer holds across the merged list.
 
 Format: `[phrase A first word] _____ [phrase B second word]` → answer is the shared middle word.
 
