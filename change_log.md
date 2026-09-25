@@ -175,3 +175,11 @@ Append-only. Newest entry first. One entry per finding, decision, or change.
 - **Why it matters:** confirms the phrase mechanic isn't just a content variant but a fully general instance of the same puzzle shape — meaningful if a third mechanic ever gets proposed. Also means any future "no duplicate answer" guarantee would need a real dedup pass across the whole 172, not just within one track.
 - **Change made:** appended all 93 phrase entries to the `PUZZLES` array in `puzzles.js` (now 172 total, phrase entries at days 79–171). Updated `puzzle-candidates-phrases.md` to record the merge and point to `puzzles.js` as the source of truth. Verified in-browser: total count 172, first phrase puzzle (day 79, "card") and last (day 171, "head") both solve correctly, exhausted-beta message now triggers at day 172, and the oval overlay renders correctly on a phrase puzzle.
 - **Open assumption:** the answer-repetition consequence is accepted, not resolved — no dedup pass has been run across the merged 172. Also still open: whether the ~8 previously-flagged phrase entries (dated idioms, sometimes-fused words) get revisited later.
+
+### 2026-09-25 — UI text: "Streak" relabeled "Points streak"
+
+- **Source:** Trevor's request to change the displayed word "streak" to "points streak."
+- **Finding:** four user-visible strings said "streak" — the streak counter itself, the info-panel reset rule, the fail-state message, and the info button's `aria-label`. Left internal naming alone (`#streak`, `.streak-row`, `getStreak()`, `STORAGE_STREAK`, etc.) — those aren't visible text, and renaming them would be pure code churn with no user-facing effect.
+- **Why it matters:** none structurally — a labeling change, not a mechanic change. Worth logging anyway since it's a real, deliberate diff from what shipped.
+- **Change made:** `script.js` — streak display now "🔥 Points streak: N", fail message now "...Points streak broken." `index.html` — info-button `aria-label` now "How points streak scoring works", info-panel bullet now "...points streak resets to 0". Verified all four in-browser: the display line, the info panel toggled open, and a triggered fail state.
+- **Open assumption:** none — cosmetic, fully verified.

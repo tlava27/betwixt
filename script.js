@@ -144,7 +144,7 @@
 
     function renderStreak() {
       const streak = getStreak();
-      streakEl.textContent = streak > 0 ? "🔥 Streak: " + streak : "";
+      streakEl.textContent = streak > 0 ? "🔥 Points streak: " + streak : "";
     }
 
     function renderActive() {
@@ -238,7 +238,7 @@
       displayEl.appendChild(suffix);
 
       attemptsEl.textContent = "";
-      messageEl.textContent = 'The answer was "' + puzzle.answer + '". Streak broken.';
+      messageEl.textContent = 'The answer was "' + puzzle.answer + '". Points streak broken.';
       messageEl.className = "message failed";
       inputEl.disabled = true;
       formEl.querySelector("button").disabled = true;
