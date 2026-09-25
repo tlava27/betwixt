@@ -105,6 +105,54 @@
     container.appendChild(line);
   }
 
+  function fallbackCopy(text) {
+    try {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      const ok = document.execCommand("copy");
+      document.body.removeChild(textarea);
+      return ok;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // Shared by both share buttons (puzzle result, history). Tries the
+  // clipboard API, falls back to execCommand, falls back to a visible
+  // "copy this text" message -- never fails silently.
+  function copyWithFeedback(text, buttonEl, defaultLabel, messageEl) {
+    function showCopied() {
+      buttonEl.textContent = "Copied!";
+      setTimeout(function () {
+        buttonEl.textContent = defaultLabel;
+      }, 1500);
+    }
+
+    function showManualFallback() {
+      messageEl.textContent = 'Copy this: "' + text + '"';
+      messageEl.className = "message";
+    }
+
+    function tryFallback() {
+      if (fallbackCopy(text)) {
+        showCopied();
+      } else {
+        showManualFallback();
+      }
+    }
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(showCopied).catch(tryFallback);
+    } else {
+      tryFallback();
+    }
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     const now = new Date();
     const dayIndex = getDayIndex(now);
@@ -137,33 +185,32 @@
       });
     }
 
-    if (dayIndex < 0) {
-      gameEl.innerHTML = '<p class="end-state">Come back soon — Betwixt hasn\'t launched yet.</p>';
-      return;
-    }
-
-    if (dayIndex >= PUZZLES.length) {
-      gameEl.innerHTML =
-        '<p class="end-state">Thanks for testing the beta! More puzzles to be added soon.</p>';
-      return;
-    }
-
-    applySkipBreak(dayIndex);
-
-    const puzzle = PUZZLES[dayIndex];
-    let state = loadState(dayIndex);
-
+    // History modal setup lives before the not-launched/exhausted early
+    // returns below, on purpose -- the reopen icon has to keep working even
+    // once a player has run out of puzzles to play.
     const historyModalEl = document.getElementById("history-modal");
     const historyGridEl = document.getElementById("history-grid");
     const historyMonthLabelEl = document.getElementById("history-month-label");
     const historyPrevButton = document.getElementById("history-prev-month");
     const historyNextButton = document.getElementById("history-next-month");
     const historyCloseButton = document.getElementById("history-close-button");
+    const historyOpenButton = document.getElementById("history-open-button");
+    const historyShareButton = document.getElementById("history-share-button");
+    const historyShareMessageEl = document.getElementById("history-share-message");
 
     const MONTH_NAMES = [
       "January", "February", "March", "April", "May", "June",
       "July", "August", "September", "October", "November", "December",
     ];
+
+    const STATUS_EMOJI = {
+      five: "🟢",
+      three: "🟡",
+      one: "🟠",
+      missed: "🔴",
+      skipped: "⭕",
+      future: "⬜",
+    };
 
     function ymdToDateString(year, month, day) {
       return year + "-" + String(month + 1).padStart(2, "0") + "-" + String(day).padStart(2, "0");
@@ -178,6 +225,21 @@
     const launchParts = parseDateParts(LAUNCH_DATE);
     let historyViewYear = todayParts.year;
     let historyViewMonth = todayParts.month;
+
+    // Single source of truth for a calendar cell's outcome -- both the
+    // rendered grid and the shareable text read from this, so they can't
+    // drift out of sync with each other.
+    function getDayStatus(cellDayIndex) {
+      if (cellDayIndex < 0 || cellDayIndex > dayIndex) return "future";
+      const dayState = loadState(cellDayIndex);
+      if (dayState.solved) {
+        const points = POINTS_BY_ATTEMPT[dayState.attempts.length];
+        return points === 5 ? "five" : points === 3 ? "three" : "one";
+      }
+      if (dayState.failed) return "missed";
+      if (cellDayIndex === dayIndex) return "future"; // today, unresolved edge case
+      return "skipped";
+    }
 
     function renderHistoryCalendar() {
       historyMonthLabelEl.textContent = MONTH_NAMES[historyViewMonth] + " " + historyViewYear;
@@ -204,39 +266,44 @@
           ymdToDateString(historyViewYear, historyViewMonth, day)
         );
         const cell = document.createElement("div");
+        cell.className = "cal-day cal-day--" + getDayStatus(cellDayIndex);
         const circle = document.createElement("span");
         circle.className = "cal-day-circle";
         circle.textContent = String(day);
-
-        if (cellDayIndex < 0 || cellDayIndex > dayIndex) {
-          cell.className = "cal-day cal-day--future";
-        } else {
-          const dayState = loadState(cellDayIndex);
-          if (dayState.solved) {
-            const points = POINTS_BY_ATTEMPT[dayState.attempts.length];
-            cell.className =
-              "cal-day " +
-              (points === 5 ? "cal-day--five" : points === 3 ? "cal-day--three" : "cal-day--one");
-          } else if (dayState.failed) {
-            cell.className = "cal-day cal-day--missed";
-          } else if (cellDayIndex === dayIndex) {
-            // Today, not yet resolved. Shouldn't normally be reachable (the
-            // modal only opens right after a solve/fail), but fall back to
-            // "future" styling rather than mislabeling it a missed day.
-            cell.className = "cal-day cal-day--future";
-          } else {
-            cell.className = "cal-day cal-day--skipped";
-          }
-        }
-
         cell.appendChild(circle);
         historyGridEl.appendChild(cell);
       }
     }
 
+    function buildHistoryShareText() {
+      const firstWeekday = new Date(historyViewYear, historyViewMonth, 1).getDay();
+      const daysInMonth = new Date(historyViewYear, historyViewMonth + 1, 0).getDate();
+      const cells = [];
+      for (let i = 0; i < firstWeekday; i++) cells.push(STATUS_EMOJI.future);
+      for (let day = 1; day <= daysInMonth; day++) {
+        const cellDayIndex = dateStringToDayIndex(
+          ymdToDateString(historyViewYear, historyViewMonth, day)
+        );
+        cells.push(STATUS_EMOJI[getDayStatus(cellDayIndex)]);
+      }
+      const rows = [];
+      for (let i = 0; i < cells.length; i += 7) {
+        rows.push(cells.slice(i, i + 7).join(""));
+      }
+      return (
+        "My Betwixt history — " +
+        MONTH_NAMES[historyViewMonth] +
+        " " +
+        historyViewYear +
+        " ᴉ\n" +
+        rows.join("\n")
+      );
+    }
+
     function openHistoryModal() {
       historyViewYear = todayParts.year;
       historyViewMonth = todayParts.month;
+      historyShareMessageEl.textContent = "";
       renderHistoryCalendar();
       historyModalEl.hidden = false;
     }
@@ -251,6 +318,7 @@
         historyViewMonth = 11;
         historyViewYear--;
       }
+      historyShareMessageEl.textContent = "";
       renderHistoryCalendar();
     });
 
@@ -260,10 +328,42 @@
         historyViewMonth = 0;
         historyViewYear++;
       }
+      historyShareMessageEl.textContent = "";
       renderHistoryCalendar();
     });
 
     historyCloseButton.addEventListener("click", closeHistoryModal);
+
+    if (historyOpenButton) {
+      historyOpenButton.addEventListener("click", openHistoryModal);
+    }
+
+    if (historyShareButton) {
+      historyShareButton.addEventListener("click", function () {
+        copyWithFeedback(
+          buildHistoryShareText(),
+          historyShareButton,
+          "Share history",
+          historyShareMessageEl
+        );
+      });
+    }
+
+    if (dayIndex < 0) {
+      gameEl.innerHTML = '<p class="end-state">Come back soon — Betwixt hasn\'t launched yet.</p>';
+      return;
+    }
+
+    if (dayIndex >= PUZZLES.length) {
+      gameEl.innerHTML =
+        '<p class="end-state">Thanks for testing the beta! More puzzles to be added soon.</p>';
+      return;
+    }
+
+    applySkipBreak(dayIndex);
+
+    const puzzle = PUZZLES[dayIndex];
+    let state = loadState(dayIndex);
 
     function renderStreak() {
       const streak = getStreak();
@@ -416,23 +516,6 @@
       messageEl.className = "message miss";
     });
 
-    function fallbackCopy(text) {
-      try {
-        const textarea = document.createElement("textarea");
-        textarea.value = text;
-        textarea.style.position = "fixed";
-        textarea.style.opacity = "0";
-        document.body.appendChild(textarea);
-        textarea.focus();
-        textarea.select();
-        const ok = document.execCommand("copy");
-        document.body.removeChild(textarea);
-        return ok;
-      } catch (e) {
-        return false;
-      }
-    }
-
     shareButton.addEventListener("click", function () {
       const text =
         "I solved today's Betwixt in " +
@@ -440,32 +523,7 @@
         "/" +
         MAX_ATTEMPTS +
         "! ᴉ";
-
-      function showCopied() {
-        shareButton.textContent = "Copied!";
-        setTimeout(function () {
-          shareButton.textContent = "Share result";
-        }, 1500);
-      }
-
-      function showManualFallback() {
-        messageEl.textContent = 'Copy this: "' + text + '"';
-        messageEl.className = "message";
-      }
-
-      function tryFallback() {
-        if (fallbackCopy(text)) {
-          showCopied();
-        } else {
-          showManualFallback();
-        }
-      }
-
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(showCopied).catch(tryFallback);
-      } else {
-        tryFallback();
-      }
+      copyWithFeedback(text, shareButton, "Share result", messageEl);
     });
 
     render();

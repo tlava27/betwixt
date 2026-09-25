@@ -16,6 +16,7 @@
     <div class="streak-row">
       <span id="streak" class="streak" aria-live="polite"></span>
       <button id="streak-info-button" class="info-button" aria-label="How points streak scoring works" aria-expanded="false">?</button>
+      <button id="history-open-button" class="history-open-button" aria-label="View puzzle history">📅</button>
     </div>
     <div id="streak-info" class="streak-info" hidden>
       <ul>
@@ -63,6 +64,8 @@
         <span><span class="legend-dot legend-missed"></span> missed puzzle</span>
         <span><span class="legend-dot legend-skipped"></span> missed day</span>
       </div>
+      <p id="history-share-message" class="message"></p>
+      <button id="history-share-button" class="share-button">Share history</button>
       <button id="history-close-button" class="history-close-button">Close</button>
     </div>
   </div>

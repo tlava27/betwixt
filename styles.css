@@ -81,6 +81,16 @@ h1 {
   line-height: 1;
 }
 
+.history-open-button {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
 .streak-info {
   max-width: 280px;
   margin: 0 auto 16px;
@@ -253,6 +263,10 @@ button {
   z-index: 10;
 }
 
+.history-modal-overlay[hidden] {
+  display: none;
+}
+
 .history-modal {
   background: var(--card-bg);
   border-radius: 12px;
@@ -391,4 +405,15 @@ button {
   background: transparent;
   color: var(--text);
   font-size: 0.9rem;
+}
+
+#history-share-button {
+  display: block;
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+#history-share-message {
+  font-size: 0.8rem;
+  word-break: break-word;
 }
