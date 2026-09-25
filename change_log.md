@@ -151,3 +151,11 @@ Append-only. Newest entry first. One entry per finding, decision, or change.
 - **Why it matters:** gives Trevor a real pool to curate from for expanding past the 56-puzzle MVP content, same process as round 1.
 - **Change made:** appended a new "Round 2" section to `puzzle-candidates.md` (23 rows, numbered 57–79) below the existing finalized 56, clearly marked as uncurated and separate from the shipped table. Nothing added to `puzzles.js` yet — this is candidates only, same two-step process as the original batch (generate → curate → merge).
 - **Open assumption:** fully uncurated. None of these 23 are in the live app yet.
+
+### 2026-09-25 — Round 2 merged into puzzles.js as-is: content now 79 puzzles
+
+- **Source:** Trevor's call to keep all 23 round-2 candidates and build — no curation cut this time, unlike round 1.
+- **Finding:** none new — re-ran the same duplicate/format checks against the merged 79-entry array (no dupes, all lowercase/letters-only) since a manual copy-paste into `puzzles.js` is exactly the kind of step that silently introduces a typo.
+- **Why it matters:** 79 is now the real content count everywhere it matters — the exhausted-content threshold, the CLAUDE.md fact, and what a player actually sees.
+- **Change made:** appended all 23 round-2 entries to the `PUZZLES` array in `puzzles.js`. Updated `puzzle-candidates.md`'s framing (round 2 is no longer "awaiting curation," it's shipped). Verified in-browser: total count is 79, the first new entry (day 56, "town") and the last (day 78, "bug") both solve correctly, and day 79 correctly shows the exhausted-beta message instead of day 56's puzzle looping back.
+- **Open assumption:** none of the 23 round-2 puzzles have been played by anyone but this testing pass — same caveat as round 1 at launch.

@@ -63,11 +63,11 @@ Format: `[fragment a] _____ [fragment b]` → answer is the shared word.
 | 55 | butter _____ trap | fly | butterfly | flytrap | |
 | 56 | tea _____ cake | cup | teacup | cupcake | |
 
-The 56 above are shipped in `puzzles.js` — don't touch that table above. Everything below is a **new, uncurated batch (round 2)** for expanding past 56, generated 2026-09-25. Same rules as before: both source compounds real, both displayed fragments standalone recognizable words, no answer reused from the 56 above.
+All 79 rows below (the original 56 plus all 23 round-2 candidates) are shipped in `puzzles.js` as of 2026-09-25 — Trevor chose to keep round 2 as-generated rather than curate it further.
 
-## Round 2 candidates — 23 new, awaiting curation
+## Round 2 — 23 more, kept as generated (no curation cuts)
 
-19 of these use connector words never used in the 56 above. The other 4 (case, stone, fish, bug) were generated in the original batch but cut during that curation round — not for being wrong, just not picked. Revisiting them here with that context rather than silently resurfacing them. (`bear` was also cut then, and stays cut — it was the one flagged "informal/toy term," so it's left out of this round rather than asked about again.)
+19 of these use connector words never used in the 56 above. The other 4 (case, stone, fish, bug) were generated in the original batch but cut during that curation round — not for being wrong, just not picked. Revisited here with that context rather than silently resurfaced. (`bear` was also cut then, and stays cut — it was the one flagged "informal/toy term," so it's left out of this round rather than asked about again.)
 
 | # | Display | Answer | Source A | Source B | Notes |
 |---|---|---|---|---|---|
