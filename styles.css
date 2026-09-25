@@ -75,6 +75,15 @@ h1 {
   vertical-align: middle;
 }
 
+.blank-line {
+  display: inline-block;
+  width: 3em;
+  height: 1.4em;
+  margin: 0 4px;
+  border-bottom: 2px solid var(--border);
+  vertical-align: middle;
+}
+
 #guess-form {
   display: flex;
   gap: 8px;

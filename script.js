@@ -1,7 +1,6 @@
 (function () {
   const LAUNCH_DATE = "2026-09-25"; // Eastern calendar date for puzzle index 0
   const MAX_ATTEMPTS = 3;
-  const FIXED_BLANK_WIDTH = 5; // placeholder width for guesses 1-2; never hints at real length
   const STORAGE_STREAK = "betwixt_streak";
   const STORAGE_LAST_PLAYED = "betwixt_lastPlayedDate";
   const STORAGE_STATE_PREFIX = "betwixt_state_";
@@ -59,16 +58,6 @@
     }
   }
 
-  function buildBlankSlots(answer, attemptsUsed) {
-    const width = attemptsUsed >= 2 ? answer.length : FIXED_BLANK_WIDTH;
-    const revealFirstLetter = attemptsUsed >= 1;
-    const slots = [];
-    for (let i = 0; i < width; i++) {
-      slots.push(i === 0 && revealFirstLetter ? answer[0] : "");
-    }
-    return slots;
-  }
-
   function renderBlanks(container, slots) {
     container.innerHTML = "";
     slots.forEach((letter) => {
@@ -77,6 +66,26 @@
       span.textContent = letter || "_";
       container.appendChild(span);
     });
+  }
+
+  // Guesses 1-2: a single continuous line (no countable segments, no length hint).
+  // Guess 3+: discrete per-letter boxes at the real answer length.
+  function renderBlankArea(container, answer, attemptsUsed) {
+    container.innerHTML = "";
+    if (attemptsUsed >= 2) {
+      const slots = answer.split("").map((ch, i) => (i === 0 ? ch : ""));
+      renderBlanks(container, slots);
+      return;
+    }
+    if (attemptsUsed >= 1) {
+      const letterSpan = document.createElement("span");
+      letterSpan.className = "blank-slot";
+      letterSpan.textContent = answer[0];
+      container.appendChild(letterSpan);
+    }
+    const line = document.createElement("span");
+    line.className = "blank-line";
+    container.appendChild(line);
   }
 
   document.addEventListener("DOMContentLoaded", function () {
@@ -116,13 +125,12 @@
 
     function renderActive() {
       const attemptsUsed = state.attempts.length;
-      const slots = buildBlankSlots(puzzle.answer, attemptsUsed);
       displayEl.textContent = "";
       const prefix = document.createElement("span");
       prefix.textContent = puzzle.a + " ";
       displayEl.appendChild(prefix);
       const blankSpan = document.createElement("span");
-      renderBlanks(blankSpan, slots);
+      renderBlankArea(blankSpan, puzzle.answer, attemptsUsed);
       displayEl.appendChild(blankSpan);
       const suffix = document.createElement("span");
       suffix.textContent = " " + puzzle.b;
