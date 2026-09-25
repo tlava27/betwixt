@@ -55,3 +55,19 @@ Append-only. Newest entry first. One entry per finding, decision, or change.
 - **Why it matters:** this is the first point Betwixt exists as running software rather than spec or content. The clipboard bug would have shipped silently — it only surfaced by actually clicking the button in a browser, not by reading the code.
 - **Change made:** added `puzzles.js`, `index.html`, `styles.css`, `script.js`, `.gitignore` (excludes local `.claude/` dev-server config, which points to a machine-specific temp path and isn't portable). Verified in-browser: solve path (guess 1), fail path (3 wrong guesses), hint progression (blank → first letter → full length), reload persistence (mid-puzzle and end-state), skip-a-day streak break, consecutive-day streak preservation, exhausted-puzzles state (56+ days out), and a mobile viewport render.
 - **Open assumption:** not yet deployed. GitHub Pages isn't enabled on the repo yet, nothing is pushed, and no real user has played it outside this testing.
+
+### 2026-09-25 — Repo moved: private tlaverriere/Betwixt → public tlava27/betwixt
+
+- **Source:** Trevor's request, after discovering GitHub Pages can't publish from a private repo without a paid plan.
+- **Finding:** the original repo (`github.com/tlaverriere/Betwixt`) was private — confirmed via an unauthenticated API call returning 404 where an authenticated one succeeded. Free-plan GitHub Pages requires a public repo. `tlava27/betwixt` is a separate account's public repo, created empty.
+- **Why it matters:** the live game's source, including the puzzle answers, is now publicly visible on GitHub (not just the playable site) — that's the tradeoff of the public-repo path over paying for Pages-on-private.
+- **Change made:** `git remote set-url origin` repointed at `https://github.com/tlava27/betwixt.git`; pushed `main` there. The `tlaverriere` account's cached credential had no push access to the `tlava27` repo — Trevor cleared the cached Windows credential and re-authenticated as `tlava27` to push.
+- **Open assumption:** the old `tlaverriere/Betwixt` repo still exists with the same history and hasn't been deleted or repointed anywhere — it's just no longer the one being deployed.
+
+### 2026-09-25 — First deploy failed: Jekyll processing markdown, plus a stale UTF-16 file
+
+- **Source:** Trevor pasted the GitHub Actions build log after the Pages deploy showed a red X.
+- **Finding:** two compounding issues. (1) GitHub Pages runs Jekyll by default on any repo without a `.nojekyll` file — it was trying to render `CLAUDE.md`, `change_log.md`, and `puzzle-candidates.md` as site pages under a theme, never the intent for this static app. (2) The actual build error — "source text contains invalid characters for the used encoding UTF-8" on `puzzle-candidates.md` — because that file had been committed while re-saved as UTF-16 (the same silent-editor-resave issue flagged during curation on 2026-09-25, this time it slipped through into a commit uncaught).
+- **Why it matters:** this is what actually blocked the site from going live — Pages was enabled correctly and the push landed, but every build failed before producing anything to serve. Also confirms the UTF-16 re-saving issue isn't just a cosmetic nuisance; it can break things silently.
+- **Change made:** added `.nojekyll` at repo root (disables Jekyll entirely, matching the "static, no build step" design already in `CLAUDE.md`). Rewrote `puzzle-candidates.md` as verified UTF-8 (confirmed via raw byte inspection, not just console output — PowerShell's console rendering had made a correctly-fixed file look corrupted, which cost a round of confusion before checking bytes directly).
+- **Open assumption:** whether the next deploy actually succeeds — not yet confirmed live as of this entry. Also unconfirmed: what specifically keeps re-saving `puzzle-candidates.md` as UTF-16 — still worth tracking down if it recurs.
