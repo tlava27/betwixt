@@ -495,7 +495,7 @@
         setStreak(getStreak() + POINTS_BY_ATTEMPT[state.attempts.length]);
         localStorage.setItem(STORAGE_LAST_PLAYED, String(dayIndex));
         render();
-        openHistoryModal();
+        setTimeout(openHistoryModal, 1000);
         return;
       }
 
@@ -506,7 +506,7 @@
         setStreak(0);
         localStorage.setItem(STORAGE_LAST_PLAYED, String(dayIndex));
         render();
-        openHistoryModal();
+        setTimeout(openHistoryModal, 1000);
         return;
       }
 
