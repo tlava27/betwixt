@@ -4,6 +4,7 @@
   const STORAGE_STREAK = "betwixt_streak";
   const STORAGE_LAST_PLAYED = "betwixt_lastPlayedDate";
   const STORAGE_STATE_PREFIX = "betwixt_state_";
+  const STORAGE_DEBUG_DAY_OFFSET = "betwixt_debugDayOffset"; // beta-testing "skip to next day" control
 
   function getEasternDateString(date) {
     return new Intl.DateTimeFormat("en-CA", {
@@ -23,7 +24,9 @@
 
   function getDayIndex(now) {
     const todayStr = getEasternDateString(now);
-    return dateStringToDayCount(todayStr) - dateStringToDayCount(LAUNCH_DATE);
+    const realIndex = dateStringToDayCount(todayStr) - dateStringToDayCount(LAUNCH_DATE);
+    const debugOffset = parseInt(localStorage.getItem(STORAGE_DEBUG_DAY_OFFSET) || "0", 10);
+    return realIndex + debugOffset;
   }
 
   function loadState(dayIndex) {
@@ -49,10 +52,10 @@
     localStorage.setItem(STORAGE_STREAK, String(n));
   }
 
-  function applySkipBreak(todayStr, dayIndex) {
-    const lastPlayed = localStorage.getItem(STORAGE_LAST_PLAYED);
-    if (!lastPlayed) return;
-    const lastPlayedIndex = dateStringToDayCount(lastPlayed) - dateStringToDayCount(LAUNCH_DATE);
+  function applySkipBreak(dayIndex) {
+    const raw = localStorage.getItem(STORAGE_LAST_PLAYED);
+    if (raw === null) return;
+    const lastPlayedIndex = parseInt(raw, 10);
     if (dayIndex - lastPlayedIndex > 1) {
       setStreak(0);
     }
@@ -90,7 +93,6 @@
 
   document.addEventListener("DOMContentLoaded", function () {
     const now = new Date();
-    const todayStr = getEasternDateString(now);
     const dayIndex = getDayIndex(now);
 
     const gameEl = document.getElementById("game");
@@ -101,6 +103,15 @@
     const formEl = document.getElementById("guess-form");
     const inputEl = document.getElementById("guess-input");
     const shareButton = document.getElementById("share-button");
+    const skipDayButton = document.getElementById("skip-day-button");
+
+    if (skipDayButton) {
+      skipDayButton.addEventListener("click", function () {
+        const current = parseInt(localStorage.getItem(STORAGE_DEBUG_DAY_OFFSET) || "0", 10);
+        localStorage.setItem(STORAGE_DEBUG_DAY_OFFSET, String(current + 1));
+        location.reload();
+      });
+    }
 
     if (dayIndex < 0) {
       gameEl.innerHTML = '<p class="end-state">Come back soon — Betwixt hasn\'t launched yet.</p>';
@@ -113,7 +124,7 @@
       return;
     }
 
-    applySkipBreak(todayStr, dayIndex);
+    applySkipBreak(dayIndex);
 
     const puzzle = PUZZLES[dayIndex];
     let state = loadState(dayIndex);
@@ -211,7 +222,7 @@
         state.solved = true;
         saveState(dayIndex, state);
         setStreak(getStreak() + 1);
-        localStorage.setItem(STORAGE_LAST_PLAYED, todayStr);
+        localStorage.setItem(STORAGE_LAST_PLAYED, String(dayIndex));
         render();
         return;
       }
@@ -221,7 +232,7 @@
         state.failed = true;
         saveState(dayIndex, state);
         setStreak(0);
-        localStorage.setItem(STORAGE_LAST_PLAYED, todayStr);
+        localStorage.setItem(STORAGE_LAST_PLAYED, String(dayIndex));
         render();
         return;
       }

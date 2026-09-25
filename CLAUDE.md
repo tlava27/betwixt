@@ -8,13 +8,13 @@ Example: *spotlight* + *lighthouse* → displayed as `spot _____ house` → answ
 
 **Problem:** No mobile/web game exists for this specific overlap-word puzzle format.
 
-**Current phase:** Built and locally tested. Static site (`index.html`, `styles.css`, `script.js`, `puzzles.js`) implements the full spec — daily puzzle, 3-guess hint progression, streak via `localStorage`, exhausted-content end state. Not yet deployed to GitHub Pages, not yet pushed.
+**Current phase:** Live and playable. Static site (`index.html`, `styles.css`, `script.js`, `puzzles.js`) implements the full spec — daily puzzle, 3-guess hint progression, streak via `localStorage`, exhausted-content end state — deployed at `https://tlava27.github.io/betwixt/`. All 56 puzzles content-checked. No real player has used it yet beyond this testing.
 
 ## Current State
 
 *(Keep this updated — newest status here, details in `change_log.md`.)*
 
-- 2026-09-25: First working build complete, tested locally in a browser (solve path, fail path, hint progression, skip-day streak break, exhausted-puzzles state, mobile viewport). One real bug caught by testing and fixed: the share button's clipboard copy had no fallback path when `navigator.clipboard.writeText` is denied — now falls back to `execCommand`, then to a manual "copy this text" message if that fails too. Not yet committed or pushed; GitHub Pages not yet enabled.
+- 2026-09-25: Live at `https://tlava27.github.io/betwixt/` (repo moved from private `tlaverriere/Betwixt` to public `tlava27/betwixt` — GitHub Pages needs a paid plan to publish from a private repo). Added a beta-testing "skip to next day" control and restyled the title's "i" (upside-down, dark orange). All 56 puzzles verified content-correct and end-to-end playable.
 
 ## Repository Structure
 
@@ -34,10 +34,11 @@ Example: *spotlight* + *lighthouse* → displayed as `spot _____ house` → answ
 - **Play format:** one puzzle per calendar day, same puzzle for every player. Rolls over at 12:00am US Eastern (`America/New_York`, DST-aware) — not UTC, not the player's local time.
 - **Guess mechanic:** free-text input, 3 attempts. Guess 1: fixed-width blank, no hint. Guess 2: first letter of the answer revealed. Guess 3: blank switches to match the real letter count (full-length hint). Wrong guess is a plain miss — no "close"/"too short" feedback.
 - **End states:** solve within 3 → shareable result text showing guess count. Fail all 3 → answer revealed, daily streak breaks.
-- **Streak:** tracked client-side only, `localStorage`, no accounts/backend. Breaks on failing all 3 guesses *or* skipping a day entirely. Increments on solve.
+- **Streak:** tracked client-side only, `localStorage`, no accounts/backend. Breaks on failing all 3 guesses *or* skipping a day entirely (day-index gap > 1 since last played). Increments on solve.
 - **Content:** 56 puzzles for MVP (not 50 — the interview-stage target was revised after curation), in `puzzle-candidates.md`. Once a player exhausts all 56 days, show: "Thanks for testing the beta! More puzzles to be added soon." — never loop back to puzzle #1.
-- **Platform:** static HTML/CSS/JS, no backend, no accounts. Hosted on GitHub Pages from this repo (`github.com/tlaverriere/Betwixt`).
-- **Nothing is built.** Any reference to "the game" or "the app" prior to a first prototype existing is aspirational, not a report of working software.
+- **Platform:** static HTML/CSS/JS, no backend, no accounts. Hosted on GitHub Pages from `github.com/tlava27/betwixt` (moved 2026-09-25 from the original private `tlaverriere/Betwixt` — Pages can't publish from a private repo without a paid plan). Requires `.nojekyll` at root or GitHub Pages tries to run Jekyll over the markdown files.
+- **Beta-testing day skip:** a "Skip to next day" button (`#skip-day-button`, always visible, outside the `#game` div so it survives every render state) adds to a `betwixt_debugDayOffset` localStorage value that's added to the real calendar-derived day index. Lets testers reach any puzzle without waiting for real days, and still correctly exercises the skip-breaks-streak logic. This is intentionally permanent for the beta phase, not scaffolding to remove later — revisit before a real public launch.
+- **Betwixt wordmark:** the "i" in the `<h1>` title is deliberately styled upside-down and dark orange (`.flip-i` in `styles.css`) — a design choice, not a rendering bug.
 
 ## Working Conventions
 

@@ -41,6 +41,12 @@ h1 {
   letter-spacing: 0.02em;
 }
 
+.flip-i {
+  display: inline-block;
+  transform: rotate(180deg);
+  color: #c1440e;
+}
+
 .subtitle {
   margin: 4px 0 20px;
   color: var(--muted);
@@ -158,4 +164,19 @@ button {
 .end-state {
   font-size: 1rem;
   line-height: 1.6;
+}
+
+.beta-tools {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--border);
+}
+
+.skip-day-button {
+  padding: 8px 12px;
+  font-size: 0.8rem;
+  border: 1px dashed var(--muted);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
 }
