@@ -266,7 +266,7 @@
         state.attempts.length +
         "/" +
         MAX_ATTEMPTS +
-        "! 🔗";
+        "! ᴉ";
 
       function showCopied() {
         shareButton.textContent = "Copied!";
