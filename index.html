@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Betwixt</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="card">
+    <header>
+      <h1>Betwixt</h1>
+      <p class="subtitle">Guess the word that links them.</p>
+    </header>
+
+    <div id="streak" class="streak" aria-live="polite"></div>
+
+    <div id="game">
+      <div id="puzzle-display" class="puzzle-display" aria-live="polite"></div>
+
+      <form id="guess-form" autocomplete="off">
+        <input id="guess-input" type="text" placeholder="Type your guess" aria-label="Your guess">
+        <button type="submit">Guess</button>
+      </form>
+
+      <div id="attempts" class="attempts" aria-live="polite"></div>
+      <div id="message" class="message" aria-live="polite"></div>
+
+      <button id="share-button" class="share-button" hidden>Share result</button>
+    </div>
+  </main>
+
+  <script src="puzzles.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
