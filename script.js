@@ -52,6 +52,9 @@
     localStorage.setItem(STORAGE_STREAK, String(n));
   }
 
+  // Points awarded toward the streak total, keyed by which guess solved it.
+  const POINTS_BY_ATTEMPT = { 1: 5, 2: 3, 3: 1 };
+
   function applySkipBreak(dayIndex) {
     const raw = localStorage.getItem(STORAGE_LAST_PLAYED);
     if (raw === null) return;
@@ -289,7 +292,7 @@
         state.attempts.push(guess);
         state.solved = true;
         saveState(dayIndex, state);
-        setStreak(getStreak() + 1);
+        setStreak(getStreak() + POINTS_BY_ATTEMPT[state.attempts.length]);
         localStorage.setItem(STORAGE_LAST_PLAYED, String(dayIndex));
         render();
         return;

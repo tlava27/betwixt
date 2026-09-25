@@ -14,7 +14,7 @@ Example: *spotlight* + *lighthouse* → displayed as `spot _____ house` → answ
 
 *(Keep this updated — newest status here, details in `change_log.md`.)*
 
-- 2026-09-25: Live at `https://tlava27.github.io/betwixt/` (repo moved from private `tlaverriere/Betwixt` to public `tlava27/betwixt` — GitHub Pages needs a paid plan to publish from a private repo). Added a beta-testing "skip to next day" control and restyled the title's "i" (upside-down, dark orange). All 56 puzzles verified content-correct and end-to-end playable.
+- 2026-09-25: Live at `https://tlava27.github.io/betwixt/` (repo moved from private `tlaverriere/Betwixt` to public `tlava27/betwixt` — GitHub Pages needs a paid plan to publish from a private repo). Added a beta-testing "skip to next day" control and restyled the title's "i" (upside-down, dark orange). All 56 puzzles verified content-correct and end-to-end playable. Since then: added a post-solve Venn diagram revealing the word overlap, changed the share-text icon to echo the flipped "i", and switched the streak from flat +1/day to points by guess number (5/3/1). Streak-explainer placement recommended, not yet built.
 
 ## Repository Structure
 
@@ -34,7 +34,7 @@ Example: *spotlight* + *lighthouse* → displayed as `spot _____ house` → answ
 - **Play format:** one puzzle per calendar day, same puzzle for every player. Rolls over at 12:00am US Eastern (`America/New_York`, DST-aware) — not UTC, not the player's local time.
 - **Guess mechanic:** free-text input, 3 attempts. Guess 1: fixed-width blank, no hint. Guess 2: first letter of the answer revealed. Guess 3: blank switches to match the real letter count (full-length hint). Wrong guess is a plain miss — no "close"/"too short" feedback.
 - **End states:** solve within 3 → shareable result text showing guess count. Fail all 3 → answer revealed, daily streak breaks.
-- **Streak:** tracked client-side only, `localStorage`, no accounts/backend. Breaks on failing all 3 guesses *or* skipping a day entirely (day-index gap > 1 since last played). Increments on solve.
+- **Streak:** points-based, not +1/day. Solving on guess 1 = +5, guess 2 = +3, guess 3 = +1; the running point total *is* the streak. Tracked client-side only, `localStorage`, no accounts/backend. Resets to 0 on failing all 3 guesses *or* skipping a day entirely (day-index gap > 1 since last played) — those two reset conditions are unchanged from the original +1/day design, only the reward side changed.
 - **Content:** 56 puzzles for MVP (not 50 — the interview-stage target was revised after curation), in `puzzle-candidates.md`. Once a player exhausts all 56 days, show: "Thanks for testing the beta! More puzzles to be added soon." — never loop back to puzzle #1.
 - **Platform:** static HTML/CSS/JS, no backend, no accounts. Hosted on GitHub Pages from `github.com/tlava27/betwixt` (moved 2026-09-25 from the original private `tlaverriere/Betwixt` — Pages can't publish from a private repo without a paid plan). Requires `.nojekyll` at root or GitHub Pages tries to run Jekyll over the markdown files.
 - **Beta-testing day skip:** a "Skip to next day" button (`#skip-day-button`, always visible, outside the `#game` div so it survives every render state) adds to a `betwixt_debugDayOffset` localStorage value that's added to the real calendar-derived day index. Lets testers reach any puzzle without waiting for real days, and still correctly exercises the skip-breaks-streak logic. This is intentionally permanent for the beta phase, not scaffolding to remove later — revisit before a real public launch.

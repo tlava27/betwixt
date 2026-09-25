@@ -111,3 +111,19 @@ Append-only. Newest entry first. One entry per finding, decision, or change.
 - **Why it matters:** turns the "aha" moment into something visual, reusing the win state that already exists rather than adding a new screen or flow.
 - **Change made:** added `buildVennDiagram(puzzle)` to `script.js` — two overlapping SVG circles (left = `a`+`answer`, right = `answer`+`b`), with the actual intersection lens (via `clipPath`, not alpha-blended overlap) filled solid and labeled with the answer. New `#venn-diagram` div in `index.html`, shown only in `renderSolved()`, explicitly hidden in `renderActive()`/`renderFailed()`. Verified on the canonical puzzle and on the longest word pair in the dataset (`marketplace`/`placemat`, 11 characters) — labels sit below the circles rather than inside them specifically so length doesn't matter.
 - **Open assumption:** only visually checked in this testing browser at desktop and default sizes — not checked against very small phone screens or with a screen reader (the SVG has an `aria-label` but that's untested with real assistive tech).
+
+### 2026-09-25 — Streak switched from flat +1/day to points by guess number
+
+- **Source:** Trevor's request — solving on guess 1/2/3 now earns 5/3/1 points respectively, and the running point total is the streak.
+- **Finding:** the two reset conditions (fail all 3, or skip a day) were left untouched — only the reward side of the streak changed. Nothing in the request mentioned changing what breaks a streak, so `applySkipBreak` and the fail-path `setStreak(0)` are unmodified.
+- **Why it matters:** rewards fast solves more than the old flat system did — a string of first-guess solves now climbs the streak 5x faster than one full of last-guess saves, which the old +1/day couldn't distinguish at all.
+- **Change made:** added `POINTS_BY_ATTEMPT` (`{1: 5, 2: 3, 3: 1}`) in `script.js`; the solve path now does `setStreak(getStreak() + POINTS_BY_ATTEMPT[state.attempts.length])` instead of `+ 1`. Verified end-to-end: guess-1 solve on a fresh streak → 5, guess-2 solve → +3 (8 total), guess-3 solve → +1 (9 total), then a full fail → resets to 0.
+- **Open assumption:** the app doesn't yet explain this scoring anywhere — a player watching their streak jump by 5 one day and 1 the next has no in-app way to know why. Trevor asked for a placement recommendation for this; see the next entry for what was proposed. Nothing built yet for that part.
+
+### 2026-09-25 — Recommended (not built): where to explain the points-based streak
+
+- **Source:** Trevor asked for a recommendation on where to explain the new streak scoring, without building anything yet.
+- **Recommendation given:** primary — show the points earned inline in the solve message itself (e.g. "Solved in 2/3! +3 points"), reusing the moment the rule actually applies, same philosophy as the post-solve Venn diagram. Secondary/complementary — a small always-visible "(?)" next to the streak counter revealing the full 5/3/1 table and the two reset conditions, for anyone who wants the complete rule without waiting to solve.
+- **Why it matters:** keeps the same placement principle used for the Venn diagram — teach the mechanic at the moment it's relevant rather than front-loading a rules screen nobody reads.
+- **Change made:** none — recommendation only, awaiting Trevor's pick.
+- **Open assumption:** which of the two (or both) he wants, and whether the "(?)" should be a tooltip, inline expand, or a small modal.
