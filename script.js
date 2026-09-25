@@ -91,6 +91,67 @@
     container.appendChild(line);
   }
 
+  // Post-solve reveal: two overlapping circles showing the source compounds,
+  // with the shared answer highlighted in the intersection.
+  function buildVennDiagram(puzzle) {
+    const NS = "http://www.w3.org/2000/svg";
+    const wordA = puzzle.a + puzzle.answer;
+    const wordB = puzzle.answer + puzzle.b;
+
+    function circle(cx, cy, r, fill, stroke) {
+      const c = document.createElementNS(NS, "circle");
+      c.setAttribute("cx", cx);
+      c.setAttribute("cy", cy);
+      c.setAttribute("r", r);
+      c.setAttribute("fill", fill);
+      if (stroke) {
+        c.setAttribute("stroke", stroke);
+        c.setAttribute("stroke-width", "2");
+      }
+      return c;
+    }
+
+    function text(x, y, str, size, fill, weight) {
+      const t = document.createElementNS(NS, "text");
+      t.setAttribute("x", x);
+      t.setAttribute("y", y);
+      t.setAttribute("text-anchor", "middle");
+      t.setAttribute("font-size", size);
+      t.setAttribute("fill", fill);
+      if (weight) t.setAttribute("font-weight", weight);
+      t.textContent = str;
+      return t;
+    }
+
+    const svg = document.createElementNS(NS, "svg");
+    svg.setAttribute("viewBox", "0 0 320 210");
+    svg.setAttribute("role", "img");
+    svg.setAttribute(
+      "aria-label",
+      wordA + " and " + wordB + " share the word " + puzzle.answer
+    );
+
+    const defs = document.createElementNS(NS, "defs");
+    const clipPath = document.createElementNS(NS, "clipPath");
+    clipPath.setAttribute("id", "venn-clip");
+    clipPath.appendChild(circle(190, 95, 70));
+    defs.appendChild(clipPath);
+    svg.appendChild(defs);
+
+    svg.appendChild(circle(110, 95, 70, "#eef2ee", "#2f6f4f"));
+    svg.appendChild(circle(190, 95, 70, "#fdece3", "#c1440e"));
+
+    const overlap = circle(110, 95, 70, "#c1440e");
+    overlap.setAttribute("clip-path", "url(#venn-clip)");
+    svg.appendChild(overlap);
+
+    svg.appendChild(text(110, 190, wordA, "12", "#1a1a1a"));
+    svg.appendChild(text(190, 190, wordB, "12", "#1a1a1a"));
+    svg.appendChild(text(150, 101, puzzle.answer, "15", "#ffffff", "700"));
+
+    return svg;
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     const now = new Date();
     const dayIndex = getDayIndex(now);
@@ -103,6 +164,7 @@
     const formEl = document.getElementById("guess-form");
     const inputEl = document.getElementById("guess-input");
     const shareButton = document.getElementById("share-button");
+    const vennEl = document.getElementById("venn-diagram");
     const skipDayButton = document.getElementById("skip-day-button");
 
     if (skipDayButton) {
@@ -152,6 +214,7 @@
       inputEl.value = "";
       formEl.querySelector("button").disabled = false;
       shareButton.hidden = true;
+      vennEl.hidden = true;
       inputEl.focus();
     }
 
@@ -174,6 +237,10 @@
       inputEl.disabled = true;
       formEl.querySelector("button").disabled = true;
       shareButton.hidden = false;
+
+      vennEl.innerHTML = "";
+      vennEl.appendChild(buildVennDiagram(puzzle));
+      vennEl.hidden = false;
     }
 
     function renderFailed() {
@@ -195,6 +262,7 @@
       inputEl.disabled = true;
       formEl.querySelector("button").disabled = true;
       shareButton.hidden = true;
+      vennEl.hidden = true;
     }
 
     function render() {

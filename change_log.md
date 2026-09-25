@@ -103,3 +103,11 @@ Append-only. Newest entry first. One entry per finding, decision, or change.
 - **Why it matters:** ties the shareable result back to the brand mark as closely as plain text allows.
 - **Change made:** share text in `script.js` changed from `"...! 🔗"` to `"...! ᴉ"`.
 - **Open assumption:** color still can't transfer to plain text — this is a shape-only echo of the wordmark, not a full match. Also unverified on real iOS/Android keyboards and fonts (only confirmed in the desktop testing browser); worth a real-device check if the character shows as a box (tofu) anywhere.
+
+### 2026-09-25 — Post-solve Venn diagram showing how the two words overlap
+
+- **Source:** Trevor asked for a recommendation on visualizing "the middle word completes the first word and starts the second," like a Venn diagram, and explicitly asked to be consulted before any changes. Presented three options (post-solve reveal / permanent how-it-works explainer / word-shaped overlap animation); he picked the post-solve reveal.
+- **Finding:** placement mattered more than shape — showing the overlap for *today's* puzzle anywhere before a solve would spoil the answer, so this only ever renders after `state.solved` is true, never on the failed path (confirmed: stays hidden on fail).
+- **Why it matters:** turns the "aha" moment into something visual, reusing the win state that already exists rather than adding a new screen or flow.
+- **Change made:** added `buildVennDiagram(puzzle)` to `script.js` — two overlapping SVG circles (left = `a`+`answer`, right = `answer`+`b`), with the actual intersection lens (via `clipPath`, not alpha-blended overlap) filled solid and labeled with the answer. New `#venn-diagram` div in `index.html`, shown only in `renderSolved()`, explicitly hidden in `renderActive()`/`renderFailed()`. Verified on the canonical puzzle and on the longest word pair in the dataset (`marketplace`/`placemat`, 11 characters) — labels sit below the circles rather than inside them specifically so length doesn't matter.
+- **Open assumption:** only visually checked in this testing browser at desktop and default sizes — not checked against very small phone screens or with a screen reader (the SVG has an `aria-label` but that's untested with real assistive tech).

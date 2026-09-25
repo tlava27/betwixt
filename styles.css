@@ -166,6 +166,16 @@ button {
   line-height: 1.6;
 }
 
+.venn-diagram {
+  margin: 4px 0 16px;
+}
+
+.venn-diagram svg {
+  width: 100%;
+  max-width: 280px;
+  height: auto;
+}
+
 .beta-tools {
   margin-top: 20px;
   padding-top: 16px;
