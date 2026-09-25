@@ -22,9 +22,20 @@
     return Math.floor(new Date(dateStr + "T00:00:00Z").getTime() / 86400000);
   }
 
+  function dateStringToDayIndex(dateStr) {
+    return dateStringToDayCount(dateStr) - dateStringToDayCount(LAUNCH_DATE);
+  }
+
+  // Inverse of dateStringToDayIndex — UTC-anchored like its counterpart, so
+  // this stays correct across DST the same way the forward conversion does.
+  function dayIndexToDateString(dayIndex) {
+    const ms = (dateStringToDayCount(LAUNCH_DATE) + dayIndex) * 86400000;
+    return new Date(ms).toISOString().slice(0, 10);
+  }
+
   function getDayIndex(now) {
     const todayStr = getEasternDateString(now);
-    const realIndex = dateStringToDayCount(todayStr) - dateStringToDayCount(LAUNCH_DATE);
+    const realIndex = dateStringToDayIndex(todayStr);
     const debugOffset = parseInt(localStorage.getItem(STORAGE_DEBUG_DAY_OFFSET) || "0", 10);
     return realIndex + debugOffset;
   }
@@ -141,6 +152,118 @@
 
     const puzzle = PUZZLES[dayIndex];
     let state = loadState(dayIndex);
+
+    const historyModalEl = document.getElementById("history-modal");
+    const historyGridEl = document.getElementById("history-grid");
+    const historyMonthLabelEl = document.getElementById("history-month-label");
+    const historyPrevButton = document.getElementById("history-prev-month");
+    const historyNextButton = document.getElementById("history-next-month");
+    const historyCloseButton = document.getElementById("history-close-button");
+
+    const MONTH_NAMES = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December",
+    ];
+
+    function ymdToDateString(year, month, day) {
+      return year + "-" + String(month + 1).padStart(2, "0") + "-" + String(day).padStart(2, "0");
+    }
+
+    function parseDateParts(dateStr) {
+      const parts = dateStr.split("-").map(Number);
+      return { year: parts[0], month: parts[1] - 1, day: parts[2] };
+    }
+
+    const todayParts = parseDateParts(dayIndexToDateString(dayIndex));
+    const launchParts = parseDateParts(LAUNCH_DATE);
+    let historyViewYear = todayParts.year;
+    let historyViewMonth = todayParts.month;
+
+    function renderHistoryCalendar() {
+      historyMonthLabelEl.textContent = MONTH_NAMES[historyViewMonth] + " " + historyViewYear;
+
+      const isEarliestMonth =
+        historyViewYear === launchParts.year && historyViewMonth === launchParts.month;
+      const isLatestMonth =
+        historyViewYear === todayParts.year && historyViewMonth === todayParts.month;
+      historyPrevButton.disabled = isEarliestMonth;
+      historyNextButton.disabled = isLatestMonth;
+
+      historyGridEl.innerHTML = "";
+      const firstWeekday = new Date(historyViewYear, historyViewMonth, 1).getDay();
+      const daysInMonth = new Date(historyViewYear, historyViewMonth + 1, 0).getDate();
+
+      for (let i = 0; i < firstWeekday; i++) {
+        const blank = document.createElement("div");
+        blank.className = "cal-day cal-day--empty";
+        historyGridEl.appendChild(blank);
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const cellDayIndex = dateStringToDayIndex(
+          ymdToDateString(historyViewYear, historyViewMonth, day)
+        );
+        const cell = document.createElement("div");
+        const circle = document.createElement("span");
+        circle.className = "cal-day-circle";
+        circle.textContent = String(day);
+
+        if (cellDayIndex < 0 || cellDayIndex > dayIndex) {
+          cell.className = "cal-day cal-day--future";
+        } else {
+          const dayState = loadState(cellDayIndex);
+          if (dayState.solved) {
+            const points = POINTS_BY_ATTEMPT[dayState.attempts.length];
+            cell.className =
+              "cal-day " +
+              (points === 5 ? "cal-day--five" : points === 3 ? "cal-day--three" : "cal-day--one");
+          } else if (dayState.failed) {
+            cell.className = "cal-day cal-day--missed";
+          } else if (cellDayIndex === dayIndex) {
+            // Today, not yet resolved. Shouldn't normally be reachable (the
+            // modal only opens right after a solve/fail), but fall back to
+            // "future" styling rather than mislabeling it a missed day.
+            cell.className = "cal-day cal-day--future";
+          } else {
+            cell.className = "cal-day cal-day--skipped";
+          }
+        }
+
+        cell.appendChild(circle);
+        historyGridEl.appendChild(cell);
+      }
+    }
+
+    function openHistoryModal() {
+      historyViewYear = todayParts.year;
+      historyViewMonth = todayParts.month;
+      renderHistoryCalendar();
+      historyModalEl.hidden = false;
+    }
+
+    function closeHistoryModal() {
+      historyModalEl.hidden = true;
+    }
+
+    historyPrevButton.addEventListener("click", function () {
+      historyViewMonth--;
+      if (historyViewMonth < 0) {
+        historyViewMonth = 11;
+        historyViewYear--;
+      }
+      renderHistoryCalendar();
+    });
+
+    historyNextButton.addEventListener("click", function () {
+      historyViewMonth++;
+      if (historyViewMonth > 11) {
+        historyViewMonth = 0;
+        historyViewYear++;
+      }
+      renderHistoryCalendar();
+    });
+
+    historyCloseButton.addEventListener("click", closeHistoryModal);
 
     function renderStreak() {
       const streak = getStreak();
@@ -272,6 +395,7 @@
         setStreak(getStreak() + POINTS_BY_ATTEMPT[state.attempts.length]);
         localStorage.setItem(STORAGE_LAST_PLAYED, String(dayIndex));
         render();
+        openHistoryModal();
         return;
       }
 
@@ -282,6 +406,7 @@
         setStreak(0);
         localStorage.setItem(STORAGE_LAST_PLAYED, String(dayIndex));
         render();
+        openHistoryModal();
         return;
       }
 
