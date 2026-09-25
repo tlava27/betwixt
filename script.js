@@ -169,6 +169,16 @@
     const shareButton = document.getElementById("share-button");
     const vennEl = document.getElementById("venn-diagram");
     const skipDayButton = document.getElementById("skip-day-button");
+    const streakInfoButton = document.getElementById("streak-info-button");
+    const streakInfoEl = document.getElementById("streak-info");
+
+    if (streakInfoButton) {
+      streakInfoButton.addEventListener("click", function () {
+        const showing = !streakInfoEl.hidden;
+        streakInfoEl.hidden = showing;
+        streakInfoButton.setAttribute("aria-expanded", String(!showing));
+      });
+    }
 
     if (skipDayButton) {
       skipDayButton.addEventListener("click", function () {
@@ -235,7 +245,10 @@
       displayEl.appendChild(suffix);
 
       attemptsEl.textContent = "";
-      messageEl.textContent = "Solved in " + state.attempts.length + "/" + MAX_ATTEMPTS + "!";
+      const pointsEarned = POINTS_BY_ATTEMPT[state.attempts.length];
+      const pointsWord = pointsEarned === 1 ? "point" : "points";
+      messageEl.textContent =
+        "Solved in " + state.attempts.length + "/" + MAX_ATTEMPTS + "! +" + pointsEarned + " " + pointsWord;
       messageEl.className = "message solved";
       inputEl.disabled = true;
       formEl.querySelector("button").disabled = true;

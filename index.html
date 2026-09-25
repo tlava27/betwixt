@@ -13,7 +13,18 @@
       <p class="subtitle">Guess the word that links them.</p>
     </header>
 
-    <div id="streak" class="streak" aria-live="polite"></div>
+    <div class="streak-row">
+      <span id="streak" class="streak" aria-live="polite"></span>
+      <button id="streak-info-button" class="info-button" aria-label="How streak scoring works" aria-expanded="false">?</button>
+    </div>
+    <div id="streak-info" class="streak-info" hidden>
+      <ul>
+        <li>Solve in 1 guess: <strong>+5</strong></li>
+        <li>Solve in 2 guesses: <strong>+3</strong></li>
+        <li>Solve in 3 guesses: <strong>+1</strong></li>
+        <li>Miss all 3, or skip a day: streak resets to <strong>0</strong></li>
+      </ul>
+    </div>
 
     <div id="game">
       <div id="puzzle-display" class="puzzle-display" aria-live="polite"></div>

@@ -53,11 +53,53 @@ h1 {
   font-size: 0.95rem;
 }
 
+.streak-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
 .streak {
   font-size: 0.9rem;
   color: var(--muted);
-  margin-bottom: 20px;
   min-height: 1.2em;
+}
+
+.info-button {
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--muted);
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.7rem;
+  line-height: 1;
+}
+
+.streak-info {
+  max-width: 280px;
+  margin: 0 auto 16px;
+  padding: 10px 14px;
+  background: var(--box-bg);
+  border-radius: 8px;
+  font-size: 0.8rem;
+  text-align: left;
+}
+
+.streak-info ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.streak-info li {
+  margin-bottom: 4px;
+}
+
+.streak-info li:last-child {
+  margin-bottom: 0;
 }
 
 .puzzle-display {

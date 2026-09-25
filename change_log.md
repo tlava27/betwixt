@@ -127,3 +127,11 @@ Append-only. Newest entry first. One entry per finding, decision, or change.
 - **Why it matters:** keeps the same placement principle used for the Venn diagram — teach the mechanic at the moment it's relevant rather than front-loading a rules screen nobody reads.
 - **Change made:** none — recommendation only, awaiting Trevor's pick.
 - **Open assumption:** which of the two (or both) he wants, and whether the "(?)" should be a tooltip, inline expand, or a small modal.
+
+### 2026-09-25 — Built both streak explainers: inline points, and the "(?)" panel
+
+- **Source:** Trevor picked both recommended options from the prior entry.
+- **Finding:** none structural, but caught a grammar bug while testing: "+1 points" (should be singular "point") on a third-guess solve — fixed before shipping, confirmed by actually triggering a 3rd-guess solve rather than assuming the string was fine.
+- **Why it matters:** together these cover both audiences — players who learn by doing (inline "+N points" the moment they solve) and players who want the full rule upfront (the "(?)" toggle, visible even before their first solve since it sits outside the streak count's own hidden-when-zero logic).
+- **Change made:** solve message now reads `"Solved in X/3! +N point(s)"` with correct singular/plural. Added a `#streak-info-button` ("?", always visible) next to the streak counter that toggles a `#streak-info` panel listing all four rules (5/3/1 scoring, reset on fail or skip). Verified: panel toggles open/closed, stays visible pre-solve, and the points message is grammatically correct at both +1 and +5.
+- **Open assumption:** none — both pieces verified in-browser end to end.
